@@ -33,6 +33,12 @@ For windows
 .\venv\Scripts\activate
 ```
 
+To run the dev server
+
+```bash
+poetry run fastapi dev backend/main.py
+```
+
 To run ruff linters and formatter
 
 ```bash
