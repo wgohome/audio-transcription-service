@@ -32,3 +32,13 @@ For windows
 ```ps1
 .\venv\Scripts\activate
 ```
+
+To run ruff linters and formatter
+
+```bash
+poetry run ruff check
+```
+
+```bash
+poetry run ruff format
+```
