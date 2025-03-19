@@ -2,23 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "./data-table";
 import { columns, Transcription } from "./transcriptions-columns";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { BASE_API_URL } from "@/configurations";
+import { useDebounce } from "@uidotdev/usehooks";
 
 export default function TranscriptionListing() {
 
   const [searchTerm, setSearchTerm] = useState("");
-
-  const submitSearch = useCallback(() => {
-    console.log("Clicked search button to search for:", searchTerm);
-    setSearchTerm(t => t);
-  }, [searchTerm]);
-
+  const filenameQuery = useDebounce(searchTerm, 1000);
 
   const query = useQuery({
-    queryKey: ["transcriptions"],
+    queryKey: ["transcriptions", filenameQuery],
     queryFn: async () => {
+      // Let search API get the results
+      if (filenameQuery) return [];
+
       const response = await fetch(`${BASE_API_URL}/transcriptions`);
       const rawData = await response.json();
       return rawData.map(
@@ -33,7 +31,7 @@ export default function TranscriptionListing() {
   });
 
   const filteredQuery = useQuery({
-    queryKey: ["filteredTranscriptions", searchTerm],
+    queryKey: ["filteredTranscriptions", filenameQuery],
     queryFn: async () => {
       // Avoid API call before user types in search bar
       if (!searchTerm) return [];
@@ -63,20 +61,11 @@ export default function TranscriptionListing() {
         <Input
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target?.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              submitSearch();
-            }
-          }}
           type="email"
           placeholder="Search by filename"
         />
-        {/* Using submit button and Enter to avoid having to debounce for now */}
-        <Button variant="outline" onClick={() => submitSearch()}>
-          Search
-        </Button>
       </div>
-      <DataTable columns={columns} data={searchTerm ? filteredTranscriptions : transcriptions} />
+      <DataTable columns={columns} data={filenameQuery ? filteredTranscriptions : transcriptions} />
     </>
   );
 }
