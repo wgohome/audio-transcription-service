@@ -1,14 +1,21 @@
 from backend.db import SessionDep, create_db_and_tables
 from backend.models import Transcription
+from backend.transcription_service import setup_transcriber_queue
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from sqlmodel import select
 
 
+# Model queues
+model_queues = {}
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+    model_queues["transcriber_1"] = setup_transcriber_queue()
     yield
+    model_queues.clear()
 
 
 app = FastAPI(lifespan=lifespan)
