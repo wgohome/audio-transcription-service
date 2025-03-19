@@ -1,21 +1,24 @@
-from backend.db import SessionDep, create_db_and_tables
+from backend.db_setup import SessionDep, create_db_and_tables
+from backend.domain.generate_filename import generate_filename
 from backend.models import Transcription
-from backend.transcription_service import setup_transcriber_queue
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.concurrency import asynccontextmanager
 from sqlmodel import select
+from transformers import pipeline
 
 
 # Model queues
-model_queues = {}
+models = {}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
-    model_queues["transcriber_1"] = setup_transcriber_queue()
+    models["transcriber_1"] = pipeline(
+        task="automatic-speech-recognition", model="openai/whisper-tiny"
+    )
     yield
-    model_queues.clear()
+    models.clear()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -24,6 +27,42 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/health")
 def get_health():
     return {"status": "up"}
+
+
+@app.post("/transcribe", response_model=list[Transcription])
+async def upload_files_for_transcription(files: list[UploadFile], session: SessionDep):
+    filenames = [file.filename for file in files]
+    statement = select(Transcription.filename).where(
+        Transcription.filename.in_(filenames)  # type: ignore
+    )
+    existing_transcriptions = session.exec(statement).all()
+
+    transcriptions: list[Transcription] = []
+    for file in files:
+        if not file.filename:
+            # Error handling
+            continue
+        formatted_filename = (
+            generate_filename(file.filename, list(existing_transcriptions))
+            if file.filename in existing_transcriptions
+            else file.filename
+        )
+
+        audio_content = await file.read()
+        result = models["transcriber_1"](audio_content)
+        transcription = Transcription(
+            filename=formatted_filename, transcribed_text=result["text"]
+        )
+        transcriptions.append(transcription)
+        session.add(transcription)
+
+    session.commit()
+
+    # Bad! Many DB round trips per transcation. Needa check if ORM supports a better way or need manual SQL
+    for transcription in transcriptions:
+        session.refresh(transcription)
+
+    return transcriptions
 
 
 # TODO: To update to /transcribe endpoint that takes files later
