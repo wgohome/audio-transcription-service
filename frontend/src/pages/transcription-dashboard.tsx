@@ -7,6 +7,7 @@ export default function TranscriptionDashboard() {
     <div className="py-4">
       <h1 className="text-4xl text-center my-4">Audio Transcription Service</h1>
       <AudioSubmissionForm />
+      <hr className="mb-4"/>
       <TranscriptionListing />
     </div>
   )
