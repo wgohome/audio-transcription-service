@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "./data-table";
 import { columns, Transcription } from "./transcriptions-columns";
 import { Input } from "./ui/input";
@@ -8,12 +8,11 @@ import { BASE_API_URL } from "@/configurations";
 
 export default function TranscriptionListing() {
 
-  const queryClient = useQueryClient();
-
   const [searchTerm, setSearchTerm] = useState("");
 
   const submitSearch = useCallback(() => {
-    console.log("Search for:", searchTerm);
+    console.log("Clicked search button to search for:", searchTerm);
+    setSearchTerm(t => t);
   }, [searchTerm]);
 
 
@@ -33,40 +32,30 @@ export default function TranscriptionListing() {
     },
   });
 
-  const demoTranscriptions: Transcription[] = [
-    {
-      id: 1,
-      filename: "audio1.mp3",
-      transcribedText: "Hello, world!",
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)), // Random timestamp
+  const filteredQuery = useQuery({
+    queryKey: ["filteredTranscriptions", searchTerm],
+    queryFn: async () => {
+      // Avoid API call before user types in search bar
+      if (!searchTerm) return [];
+
+      const queryParams = new URLSearchParams({ filename: searchTerm });
+      const response = await fetch(`${BASE_API_URL}/search?${queryParams}`);
+      const rawData = await response.json();
+      return rawData.map(
+        (data): Transcription => ({
+          id: data.id,
+          filename: data.filename,
+          transcribedText: data.transcribed_text,
+          createdAt: new Date(data.created_at),
+        })
+      );
     },
-    {
-      id: 2,
-      filename: "audio2.mp3",
-      transcribedText: "This is a test transcription.",
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-    },
-    {
-      id: 3,
-      filename: "audio3.mp3",
-      transcribedText: "Another example transcription.",
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-    },
-    {
-      id: 4,
-      filename: "audio4.mp3",
-      transcribedText: "Transcription for audio file 4.",
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-    },
-    {
-      id: 5,
-      filename: "audio5.mp3",
-      transcribedText: "Final example transcription.",
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-    },
-  ];
+  });
 
   const transcriptions = query.data ?? [];
+  const filteredTranscriptions = filteredQuery.data ?? [];
+
+  // TODO: handle query.isPending, query.error -> toast?
 
   return (
     <>
@@ -87,7 +76,7 @@ export default function TranscriptionListing() {
           Search
         </Button>
       </div>
-      <DataTable columns={columns} data={transcriptions} />
+      <DataTable columns={columns} data={searchTerm ? filteredTranscriptions : transcriptions} />
     </>
   );
 }
