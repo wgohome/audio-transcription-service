@@ -1,9 +1,26 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "./data-table";
 import { columns, Transcription } from "./transcriptions-columns";
 
 export default function TranscriptionListing() {
 
-  const transcriptions: Transcription[] = [
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ["transcriptions"],
+    queryFn: async () => {
+      const response = await fetch("http://127.0.0.1:8000/transcriptions");
+      const rawData = await response.json();
+      return rawData.map((data): Transcription => ({
+        id: data.id,
+        filename: data.filename,
+        transcribedText: data.transcribed_text,
+        createdAt: new Date(data.created_at),
+      }));
+    },
+  });
+
+  const demo_transcriptions: Transcription[] = [
     {
       id: 1,
       filename: "audio1.mp3",
@@ -35,6 +52,8 @@ export default function TranscriptionListing() {
       createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
     }
   ];
+
+  const transcriptions = query.data ?? [];
 
   return (
     <>
