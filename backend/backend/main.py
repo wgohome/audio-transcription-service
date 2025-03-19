@@ -3,6 +3,7 @@ from backend.domain.generate_filename import generate_filename
 from backend.models import Transcription
 from fastapi import FastAPI, UploadFile
 from fastapi.concurrency import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import select
 from transformers import pipeline
 
@@ -22,6 +23,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
