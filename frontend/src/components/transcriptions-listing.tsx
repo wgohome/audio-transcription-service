@@ -6,6 +6,13 @@ import { useState } from "react";
 import { BASE_API_URL } from "@/configurations";
 import { useDebounce } from "@uidotdev/usehooks";
 
+type TServerTranscription = {
+  id: number;
+  filename: string;
+  transcribed_text: string;
+  created_at: string;
+}
+
 export default function TranscriptionListing() {
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +27,7 @@ export default function TranscriptionListing() {
       const response = await fetch(`${BASE_API_URL}/transcriptions`);
       const rawData = await response.json();
       return rawData.map(
-        (data): Transcription => ({
+        (data: TServerTranscription): Transcription => ({
           id: data.id,
           filename: data.filename,
           transcribedText: data.transcribed_text,
@@ -40,7 +47,7 @@ export default function TranscriptionListing() {
       const response = await fetch(`${BASE_API_URL}/search?${queryParams}`);
       const rawData = await response.json();
       return rawData.map(
-        (data): Transcription => ({
+        (data: TServerTranscription): Transcription => ({
           id: data.id,
           filename: data.filename,
           transcribedText: data.transcribed_text,
