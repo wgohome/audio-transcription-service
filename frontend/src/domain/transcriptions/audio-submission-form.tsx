@@ -1,19 +1,25 @@
 import { cn } from "@/lib/utils";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import { submitAudioFiles } from "./data-access";
 import { useMutation } from "@tanstack/react-query";
 import { Transcription } from "./transcriptions-columns";
 import { ErrorResponse } from "react-router";
 import { toast } from "sonner";
+import { LoadingContext } from "@/contexts/loading-context";
 
 export default function AudioSubmissionForm() {
+  const { startLoadingSpinner, stopLoadingSpinner } = useContext(LoadingContext);
+
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
 
   const audioSubmission = useMutation<Transcription[], ErrorResponse, readonly FileWithPath[]>({
     mutationFn: async () => submitAudioFiles(acceptedFiles),
-    onMutate: () => { console.log("mutating"); },
+    onMutate: () => {
+      console.log("Submitting audio files...");
+      startLoadingSpinner();
+    },
     onSuccess: (_data) => {
       toast.success(`Audio files transcribed successfully.`);
       // TODO: Invalidate listing
@@ -22,7 +28,10 @@ export default function AudioSubmissionForm() {
       console.log("Audio submission error: ", error);
       toast.error("Failed to submit audio files.");
     },
-    onSettled: () => { console.log("settled"); },
+    onSettled: () => {
+      console.log("Audio submission settled.");
+      stopLoadingSpinner();
+    },
   });
 
   const handleSubmit = useCallback(() => {
