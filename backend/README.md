@@ -60,5 +60,5 @@ docker build -t ats-backend .
 Run container
 
 ```bash
-docker run -d -p 80:80 ats-backend
+docker run -d -p 8000:8000 ats-backend
 ```

@@ -18,4 +18,6 @@ COPY backend ./backend
 
 RUN poetry install --without dev
 
-CMD ["poetry", "run", "fastapi", "run", "backend/main.py", "--port", "80"]
+EXPOSE 8000
+
+CMD ["poetry", "run", "fastapi", "run", "backend/main.py", "--port", "8000"]
