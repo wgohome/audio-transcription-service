@@ -48,3 +48,17 @@ poetry run ruff check
 ```bash
 poetry run ruff format
 ```
+
+## Build
+
+Build docker image for backend
+
+```bash
+docker build -t ats-backend .
+```
+
+Run container
+
+```bash
+docker run -d --name ats-backend-c-0.1 -p 80:80 ats-backend
+```
