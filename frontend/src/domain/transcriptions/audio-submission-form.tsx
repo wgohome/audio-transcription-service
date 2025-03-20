@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { submitAudioFiles } from "./data-access";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Transcription } from "./transcriptions-columns";
@@ -12,12 +12,18 @@ import { LoadingContext } from "@/contexts/loading-context";
 export default function AudioSubmissionForm() {
   const { startLoadingSpinner, stopLoadingSpinner } = useContext(LoadingContext);
 
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
+  const [selectedFiles, setSelectedFiles] = useState<FileWithPath[]>([]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      setSelectedFiles(currFiles => [...currFiles, ...acceptedFiles]);
+    },
+  });
 
   const queryClient = useQueryClient();
 
   const audioSubmission = useMutation<Transcription[], ErrorResponse, readonly FileWithPath[]>({
-    mutationFn: async () => submitAudioFiles(acceptedFiles),
+    mutationFn: async (files) => submitAudioFiles(files),
     onMutate: () => {
       console.log("Submitting audio files...");
       startLoadingSpinner();
@@ -32,13 +38,14 @@ export default function AudioSubmissionForm() {
     },
     onSettled: () => {
       console.log("Audio submission settled.");
+      setSelectedFiles([]);
       stopLoadingSpinner();
     },
   });
 
   const handleSubmit = useCallback(() => {
-    audioSubmission.mutate(acceptedFiles);
-  }, [acceptedFiles]);
+    audioSubmission.mutate(selectedFiles);
+  }, [selectedFiles]);
 
   return (
     <div className="sm:w-full lg:w-1/2 mx-auto">
@@ -62,8 +69,8 @@ export default function AudioSubmissionForm() {
         </div>
 
         {/* Files selected */}
-        {acceptedFiles?.length > 0 && <p className="font-bold pt-2 my-3">Files selected:</p>}
-        {acceptedFiles.map((file) => (
+        {selectedFiles?.length > 0 && <p className="font-bold pt-2 my-3">Files selected:</p>}
+        {selectedFiles.map((file) => (
           <p key={file.name} className="my-1">
             {file.name}
           </p>
