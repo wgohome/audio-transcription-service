@@ -1,5 +1,6 @@
-import { Transcription } from "./components/transcriptions-columns";
-import { BASE_API_URL } from "./configurations";
+import { FileWithPath } from "react-dropzone";
+import { Transcription } from "./transcriptions-columns";
+import { BASE_API_URL } from "@/configurations";
 
 type TServerTranscription = {
   id: number;
@@ -7,6 +8,10 @@ type TServerTranscription = {
   transcribed_text: string;
   created_at: string;
 };
+
+export type ErrorResponse = {
+  message: string;
+}
 
 export async function getTranscriptions(searchTerm: string) {
   if (searchTerm) {
@@ -36,4 +41,23 @@ function mapServerTranscriptionToClientTranscription(data: TServerTranscription)
     transcribedText: data.transcribed_text,
     createdAt: new Date(data.created_at),
   };
+}
+
+export async function submitAudioFiles(files: readonly FileWithPath[]) {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append(`files`, file);
+  });
+
+  const response = await fetch(`${BASE_API_URL}/transcribe`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error);
+  }
+
+  return await response.json();
 }

@@ -1,14 +1,32 @@
 import { cn } from "@/lib/utils";
-import { useDropzone } from "react-dropzone";
-import { Button } from "./ui/button";
+import { FileWithPath, useDropzone } from "react-dropzone";
+import { Button } from "@/components/ui/button";
 import { useCallback } from "react";
+import { submitAudioFiles } from "./data-access";
+import { useMutation } from "@tanstack/react-query";
+import { Transcription } from "./transcriptions-columns";
+import { ErrorResponse } from "react-router";
+import { toast } from "sonner";
 
 export default function AudioSubmissionForm() {
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
 
+  const audioSubmission = useMutation<Transcription[], ErrorResponse, readonly FileWithPath[]>({
+    mutationFn: async () => submitAudioFiles(acceptedFiles),
+    onMutate: () => { console.log("mutating"); },
+    onSuccess: (_data) => {
+      toast.success(`Audio files transcribed successfully.`);
+      // TODO: Invalidate listing
+    },
+    onError: (error) => {
+      console.log("Audio submission error: ", error);
+      toast.error("Failed to submit audio files.");
+    },
+    onSettled: () => { console.log("settled"); },
+  });
+
   const handleSubmit = useCallback(() => {
-    // TODO: Pass to parent?
-    console.log(acceptedFiles);
+    audioSubmission.mutate(acceptedFiles);
   }, [acceptedFiles]);
 
   return (
@@ -40,12 +58,12 @@ export default function AudioSubmissionForm() {
         ))}
 
         {/* Error section */}
-        <div className="">
+        <div className="hidden">
           <p className="text-left text-red-500 my-3">Error message goes here</p>
         </div>
 
         {/* Submit */}
-        <div className="flex flex-row-reverse py-3">
+        <div className="flex justify-center py-3">
           <Button className="w-[240px]" onClick={handleSubmit}>
             Transcribe
           </Button>

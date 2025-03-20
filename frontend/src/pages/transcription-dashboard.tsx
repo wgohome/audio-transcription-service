@@ -1,5 +1,5 @@
-import AudioSubmissionForm from "../components/audio-submission-form";
-import TranscriptionListing from "../components/transcriptions-listing";
+import AudioSubmissionForm from "../domain/transcriptions/audio-submission-form";
+import TranscriptionListing from "../domain/transcriptions/transcriptions-listing";
 
 export default function TranscriptionDashboard() {
 
