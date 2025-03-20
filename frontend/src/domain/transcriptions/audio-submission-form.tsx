@@ -3,7 +3,7 @@ import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { useCallback, useContext } from "react";
 import { submitAudioFiles } from "./data-access";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Transcription } from "./transcriptions-columns";
 import { ErrorResponse } from "react-router";
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ export default function AudioSubmissionForm() {
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
 
+  const queryClient = useQueryClient();
+
   const audioSubmission = useMutation<Transcription[], ErrorResponse, readonly FileWithPath[]>({
     mutationFn: async () => submitAudioFiles(acceptedFiles),
     onMutate: () => {
@@ -22,7 +24,7 @@ export default function AudioSubmissionForm() {
     },
     onSuccess: (_data) => {
       toast.success(`Audio files transcribed successfully.`);
-      // TODO: Invalidate listing
+      queryClient.invalidateQueries({ queryKey: ["get_transcriptions"] });
     },
     onError: (error) => {
       console.log("Audio submission error: ", error);
@@ -46,7 +48,8 @@ export default function AudioSubmissionForm() {
           <div
             {...getRootProps()}
             className={cn(
-              "flex justify-center items-center h-32 border-dashed border-2 border-gray-200 rounded-lg hover:bg-accent hover:text-accent-foreground transition-all select-none cursor-pointer"
+              "flex justify-center items-center h-32 border-dashed border-2 border-gray-200 rounded-lg",
+              "hover:bg-accent hover:text-accent-foreground transition-all select-none cursor-pointer"
             )}
           >
             <input {...getInputProps()} />
