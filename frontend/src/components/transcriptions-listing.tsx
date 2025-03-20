@@ -20,16 +20,15 @@ export default function TranscriptionListing() {
 
   return (
     <>
-      <div className="flex gap-2 my-3">
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target?.value)}
-          type="email"
-          placeholder="Search by filename"
-        />
-        {/* API don't return specific error yet, when we do, we can display the more specific error here. */}
-        {transcriptionsQuery.error && (<p>Failed to retrieve transcriptions.</p>)}
-      </div>
+      <Input
+        className="my-3"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target?.value)}
+        type="email"
+        placeholder="Search by filename"
+      />
+      {/* API don't return specific error yet, when we do, we can display the more specific error here. */}
+      {transcriptionsQuery.error && (<p className="text-sm text-red-500 my-3">Failed to retrieve transcriptions.</p>)}
       <DataTable columns={columns} data={transcriptionsQuery.data ?? []} />
     </>
   );

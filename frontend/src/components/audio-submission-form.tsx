@@ -12,10 +12,10 @@ export default function AudioSubmissionForm() {
   }, [acceptedFiles]);
 
   return (
-    <div className="mx-2">
+    <div className="sm:w-full lg:w-1/2 mx-auto">
       <div className="flex flex-col">
         {/* File dropzone */}
-        <div className="sm:w-full lg:w-1/2 mx-auto pt-8">
+        <div className="pt-8">
           <div
             {...getRootProps()}
             className={cn(
@@ -32,6 +32,7 @@ export default function AudioSubmissionForm() {
         </div>
 
         {/* Files selected */}
+        {acceptedFiles?.length > 0 && <p className="font-bold pt-2 my-3">Files selected:</p>}
         {acceptedFiles.map((file) => (
           <p key={file.name} className="my-1">
             {file.name}
@@ -45,7 +46,9 @@ export default function AudioSubmissionForm() {
 
         {/* Submit */}
         <div className="flex flex-row-reverse py-3">
-          <Button className="w-[240px]" onClick={handleSubmit}>Transcribe</Button>
+          <Button className="w-[240px]" onClick={handleSubmit}>
+            Transcribe
+          </Button>
         </div>
       </div>
     </div>
