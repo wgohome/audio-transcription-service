@@ -1,4 +1,4 @@
-from backend.dependencies_setup import SessionDep, TranscriptionServiceDep, create_db_and_tables
+from backend.dependencies_setup import SessionDep, TranscriptionRepositoryDep, TranscriptionServiceDep, create_db_and_tables
 from backend.db_models import Transcription
 from fastapi import FastAPI, UploadFile
 from fastapi.concurrency import asynccontextmanager
@@ -54,19 +54,13 @@ def create_transcription(filenames: list[str], session: SessionDep):
 
 
 @app.get("/transcriptions", response_model=list[Transcription])
-def get_transcriptions(session: SessionDep):
-    statement = select(Transcription).where(Transcription.transcribed_text is not None)
-    transcriptions = session.exec(statement).all()
-    return transcriptions
+def get_transcriptions(repo: TranscriptionRepositoryDep):
+    return repo.get_transcriptions()
 
 
 @app.get("/search", response_model=list[Transcription])
-def search_transcription_by_filename(filename: str, session: SessionDep):
-    statement = select(Transcription).where(
-        Transcription.filename.like(f"%{filename}%")  # type: ignore
-    )
-    transcriptions = session.exec(statement).all()
-    return transcriptions
+def search_transcription_by_filename(filename: str, repo: TranscriptionRepositoryDep):
+    return repo.get_transcriptions(filename)
 
 
 @app.post("/transcribe", response_model=list[Transcription])

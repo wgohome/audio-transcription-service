@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine
 
-from backend.transcription_repository import TranscriptionRepository
-from backend.trascription_service import TranscriptionService
+from backend.domain.transcription_repository import TranscriptionRepository
+from backend.domain.trascription_service import TranscriptionService
 
 sqlite_file_name = "transcriptions.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
