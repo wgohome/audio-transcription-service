@@ -11,6 +11,7 @@ fastapi = {extras = ["standard"], version = "^0.115.11"}
 sqlmodel = "^0.0.24"
 transformers = {extras = ["torch"], version = "^4.49.0"}
 python-multipart = "^0.0.20"
+pytest = "^8.3.5"
 
 
 [tool.poetry.group.dev.dependencies]
