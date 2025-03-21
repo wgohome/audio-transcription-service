@@ -55,8 +55,19 @@ export async function submitAudioFiles(files: readonly FileWithPath[]) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error);
+    const errorContent = await response.json();
+    if (!errorContent.detail || errorContent.detail.length === 0) {
+      throw new Error("Failed to submit audio files.");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const message = errorContent.detail.map((detail: any) => {
+      if (detail.message) {
+        return detail.message;
+      } else if (detail.type === "missing") {
+        return "File is missing.";
+      }
+    }).join("; ");
+    throw new Error(message);
   }
 
   return await response.json();

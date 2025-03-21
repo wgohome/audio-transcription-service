@@ -5,7 +5,6 @@ import { useCallback, useContext, useState } from "react";
 import { submitAudioFiles } from "./data-access";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Transcription } from "./transcriptions-columns";
-import { ErrorResponse } from "react-router";
 import { toast } from "sonner";
 import { LoadingContext } from "@/contexts/loading-context";
 
@@ -13,6 +12,7 @@ export default function AudioSubmissionForm() {
   const { startLoadingSpinner, stopLoadingSpinner } = useContext(LoadingContext);
 
   const [selectedFiles, setSelectedFiles] = useState<FileWithPath[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -22,7 +22,7 @@ export default function AudioSubmissionForm() {
 
   const queryClient = useQueryClient();
 
-  const audioSubmission = useMutation<Transcription[], ErrorResponse, readonly FileWithPath[]>({
+  const audioSubmission = useMutation<Transcription[], Error, readonly FileWithPath[]>({
     mutationFn: async (files) => submitAudioFiles(files),
     onMutate: () => {
       console.log("Submitting audio files...");
@@ -35,6 +35,7 @@ export default function AudioSubmissionForm() {
     onError: (error) => {
       console.log("Audio submission error: ", error);
       toast.error("Failed to submit audio files.");
+      setErrorMessage(error.message);
     },
     onSettled: () => {
       console.log("Audio submission settled.");
@@ -77,8 +78,8 @@ export default function AudioSubmissionForm() {
         ))}
 
         {/* Error section */}
-        <div className="hidden">
-          <p className="text-left text-red-500 my-3">Error message goes here</p>
+        <div className={errorMessage ? "" : "hidden"}>
+          <p className="text-left text-red-500 my-3">{errorMessage}</p>
         </div>
 
         {/* Submit */}
