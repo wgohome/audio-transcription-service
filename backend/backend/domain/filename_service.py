@@ -62,7 +62,7 @@ class AudioFileService:
             if not file.filename:
                 errors.append(
                     ValidationResult(
-                        context="files_batch", message="filename cannot be blank"
+                        context="files_batch", message="Filename cannot be blank"
                     )
                 )
             # Check file format
