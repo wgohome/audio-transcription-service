@@ -1,9 +1,13 @@
-from backend.dependencies_setup import SessionDep, TranscriptionRepositoryDep, TranscriptionServiceDep, create_db_and_tables
+from backend.dependencies_setup import (
+    SessionDep,
+    TranscriptionRepositoryDep,
+    TranscriptionServiceDep,
+    create_db_and_tables,
+)
 from backend.db_models import Transcription
 from fastapi import FastAPI, UploadFile
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import select
 from transformers import pipeline
 
 
@@ -41,6 +45,7 @@ app.add_middleware(
 def get_health():
     return {"status": "up"}
 
+
 # For debugging purposes
 @app.post("/transcriptions", response_model=list[Transcription])
 def create_transcription(filenames: list[str], session: SessionDep):
@@ -64,7 +69,9 @@ def search_transcription_by_filename(filename: str, repo: TranscriptionRepositor
 
 
 @app.post("/transcribe", response_model=list[Transcription])
-async def upload_files_for_transcription(files: list[UploadFile], service: TranscriptionServiceDep):
+async def upload_files_for_transcription(
+    files: list[UploadFile], service: TranscriptionServiceDep
+):
     result = await service.transcribe(files, models["transcriber_1"])
     if result.errors:
         return result.errors
