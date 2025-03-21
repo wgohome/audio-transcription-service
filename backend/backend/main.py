@@ -1,11 +1,10 @@
 from backend.dependencies_setup import (
-    SessionDep,
     TranscriptionRepositoryDep,
     TranscriptionServiceDep,
     create_db_and_tables,
 )
 from backend.db_models import Transcription
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from transformers import pipeline
@@ -62,5 +61,9 @@ async def upload_files_for_transcription(
 ):
     result = await service.transcribe(files, models["transcriber_1"])
     if result.errors:
-        return result.errors
+        detail = [
+            {"context": error.context, "message": error.message}
+            for error in result.errors
+        ]
+        raise HTTPException(status_code=400, detail=detail)
     return result.data
