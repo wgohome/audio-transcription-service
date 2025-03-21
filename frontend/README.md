@@ -4,6 +4,8 @@
 
 A known version of node that works is 22.3.1.
 
+To run the frontend application:
+
 ```bash
 npm install
 npm run dev
