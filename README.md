@@ -4,7 +4,7 @@ This is an audio transcription application which allows users to upload one or m
 
 The application is served as a single-page-application (SPA) frontend web application connected to a RESTful backend API performs the inference task and stores transcriptions in a database.
 
-In production, the frontend and backend can ideally be deployed separately. The frontend can be built and served via a CDN - the benefit of using a SPA framework - as this will be more cost effective. The backend API needs to be hosted on a server, that can be exposed via HTTPS. For this reason, a docker-compose build was not prepared, but separate dockerfiles were written for the frontend and backend respectively.
+In production, the frontend and backend can ideally be deployed separately. The frontend can be built and served via a CDN - the benefit of using a SPA framework - as this will be more cost effective. The backend API needs to be hosted on a server, that can be exposed via HTTPS.
 
 To run the frontend and backend docker builds, or to run locally, refer to the respective documentation:
 
