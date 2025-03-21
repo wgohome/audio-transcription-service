@@ -1,9 +1,5 @@
 # Backend API Service
 
-## Endpoints
-
-
-
 ## Setup
 
 These are the versions of dependencies known to work with this project:
@@ -15,6 +11,7 @@ For initial setup, create a virtual environment using venv.
 
 ```bash
 python -m venv venv
+poetry install
 ```
 
 ## Development
@@ -61,4 +58,10 @@ Run container
 
 ```bash
 docker run -d -p 8000:8000 ats-backend
+```
+
+Run test
+
+```bash
+poetry run pytest
 ```
