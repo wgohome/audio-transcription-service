@@ -25,6 +25,7 @@ class AudioFileService:
 
     def generate_filename(self, original_name: str) -> str:
         if not self.existing_filenames or original_name not in self.existing_filenames:
+            self.existing_filenames.append(original_name)
             return original_name
 
         self.warnings.append(
