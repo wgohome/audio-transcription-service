@@ -4,7 +4,7 @@ from fastapi import UploadFile
 
 from backend.db_models import Transcription
 from backend.domain.common_types import ValidationResult
-from backend.domain.filename_service import AudioFileService
+from backend.domain.audio_file_service import AudioFileService
 from backend.domain.transcription_repository import TranscriptionRepository
 
 

@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-from backend.domain.filename_service import AudioFileService
+from backend.domain.audio_file_service import AudioFileService
 from fastapi import UploadFile
 import pytest
 
