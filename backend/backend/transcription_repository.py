@@ -21,13 +21,12 @@ class TranscriptionRepository:
             statement = select(Transcription)
         return list(self.db.exec(statement).all())
 
-    # Return transcriptions with filename equal to the provided filenames.
-    def get_transcriptions_by_filenames(
-        self, filenames: list[str]
-    ) -> list[Transcription]:
+    # Return transcription filenames with filename equal to the provided filenames.
+    # Batched operation to check if a list of filenames already exists.
+    def get_existing_filenames(self, filenames: list[str]) -> list[str]:
         if not filenames:
             raise ValueError("Filenames cannot be empty.")
-        statement = select(Transcription).where(
+        statement = select(Transcription.filename).where(
             Transcription.filename.in_(filenames)  # type: ignore
         )
         return list(self.db.exec(statement).all())

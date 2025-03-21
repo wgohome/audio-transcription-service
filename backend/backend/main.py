@@ -1,6 +1,5 @@
-from backend.db_setup import SessionDep, create_db_and_tables
-from backend.domain.generate_filename import generate_filename
-from backend.models import Transcription
+from backend.dependencies_setup import SessionDep, TranscriptionServiceDep, create_db_and_tables
+from backend.db_models import Transcription
 from fastapi import FastAPI, UploadFile
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,44 +41,7 @@ app.add_middleware(
 def get_health():
     return {"status": "up"}
 
-
-@app.post("/transcribe", response_model=list[Transcription])
-async def upload_files_for_transcription(files: list[UploadFile], session: SessionDep):
-    filenames = [file.filename for file in files]
-    statement = select(Transcription.filename).where(
-        Transcription.filename.in_(filenames)  # type: ignore
-    )
-    existing_transcriptions = session.exec(statement).all()
-
-    transcriptions: list[Transcription] = []
-    for file in files:
-        if not file.filename:
-            # Error handling
-            continue
-        formatted_filename = (
-            generate_filename(file.filename, list(existing_transcriptions))
-            if file.filename in existing_transcriptions
-            else file.filename
-        )
-
-        audio_content = await file.read()
-        result = models["transcriber_1"](audio_content)
-        transcription = Transcription(
-            filename=formatted_filename, transcribed_text=result["text"]
-        )
-        transcriptions.append(transcription)
-        session.add(transcription)
-
-    session.commit()
-
-    # Bad! Many DB round trips per transcation. Needa check if ORM supports a better way or need manual SQL
-    for transcription in transcriptions:
-        session.refresh(transcription)
-
-    return transcriptions
-
-
-# TODO: To update to /transcribe endpoint that takes files later
+# For debugging purposes
 @app.post("/transcriptions", response_model=list[Transcription])
 def create_transcription(filenames: list[str], session: SessionDep):
     transcriptions = [Transcription(filename=filename) for filename in filenames]
@@ -105,3 +67,11 @@ def search_transcription_by_filename(filename: str, session: SessionDep):
     )
     transcriptions = session.exec(statement).all()
     return transcriptions
+
+
+@app.post("/transcribe", response_model=list[Transcription])
+async def upload_files_for_transcription(files: list[UploadFile], service: TranscriptionServiceDep):
+    result = await service.transcribe(files, models["transcriber_1"])
+    if result.errors:
+        return result.errors
+    return result.data

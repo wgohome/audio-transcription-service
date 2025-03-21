@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 def generate_filename(original_name: str, existing_filenames: list[str] = []) -> str:
-    if not existing_filenames:
+    if not existing_filenames or original_name not in existing_filenames:
         return original_name
     name, ext = extract_file_extension(original_name)
     return f"{name}_{str(datetime.now())}.{ext}"
