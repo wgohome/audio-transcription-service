@@ -46,18 +46,6 @@ def get_health():
     return {"status": "up"}
 
 
-# For debugging purposes
-@app.post("/transcriptions", response_model=list[Transcription])
-def create_transcription(filenames: list[str], session: SessionDep):
-    transcriptions = [Transcription(filename=filename) for filename in filenames]
-    for transcription in transcriptions:
-        session.add(transcription)
-    session.commit()
-    for transcription in transcriptions:
-        session.refresh(transcription)
-    return transcriptions
-
-
 @app.get("/transcriptions", response_model=list[Transcription])
 def get_transcriptions(repo: TranscriptionRepositoryDep):
     return repo.get_transcriptions()
