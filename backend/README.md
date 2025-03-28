@@ -46,7 +46,7 @@ poetry run ruff check
 poetry run ruff format
 ```
 
-## Building docker image
+## Docker image
 
 Build docker image for backend
 
@@ -59,6 +59,8 @@ Run container
 ```bash
 docker run -d -p 8000:8000 ats-backend
 ```
+
+## Test
 
 Run test
 

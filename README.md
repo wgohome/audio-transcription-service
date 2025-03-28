@@ -11,6 +11,14 @@ To run the frontend and backend docker builds, or to run locally, refer to the r
 - [Frontend](frontend/README.md)
 - [Backend](backend/README.md)
 
+## Running the app with docker-compose
+
+```bash
+docker-compose up --build
+```
+
+## Architecture
+
 ![Architecture Diagram](docs/architecture_diagram.png)
 
 The frontend is built on React + Vite as a SPA, providing a richer interactive user experience than the traditional (obsolete) server rendered pages. There is no requirement for SEO-optimization, therefore SPA is more suitable compared to Server Side Generation (SSG) / Server Side Rendering (SSR) / React Server Component (RSC) frameworks. The frontend communicated with the backend via HTTP/HTTPS requests, passing data in JSON format (the files are submitted using form data).

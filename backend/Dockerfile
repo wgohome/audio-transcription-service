@@ -1,5 +1,11 @@
 FROM python:3.12.2
 
+RUN apt-get -y update
+
+RUN apt-get -y upgrade
+
+RUN apt-get install -y ffmpeg
+
 RUN pip install poetry==1.8.3
 
 ENV POETRY_NO_INTERACTION=1 \
