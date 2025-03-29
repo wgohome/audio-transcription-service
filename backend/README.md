@@ -62,7 +62,7 @@ docker run -d -p 8000:8000 ats-backend
 
 ## Test
 
-Run test
+Run tests
 
 ```bash
 poetry run pytest

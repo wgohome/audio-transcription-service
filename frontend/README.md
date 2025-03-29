@@ -24,3 +24,11 @@ Run container
 ```bash
 docker run -d -p 3000:3000 ats-frontend
 ```
+
+## Test
+
+Run unit tests
+
+```bash
+npm run test
+```
