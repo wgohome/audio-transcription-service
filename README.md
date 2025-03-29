@@ -13,8 +13,16 @@ To run the frontend and backend docker builds, or to run locally, refer to the r
 
 ## Running the app with docker-compose
 
+Without building locally, you can just pull the image from my dockerhub and run the app locally.
+
 ```bash
-docker-compose up --build
+docker compose pull && docker compose up
+```
+
+If you'd like to build the images locally, then run this instead:
+
+```bash
+docker compose up --build
 ```
 
 ## Architecture

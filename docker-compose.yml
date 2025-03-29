@@ -5,6 +5,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: wirriamm/ats-frontend:0.1
     ports:
       - "3000:3000"
     depends_on:
@@ -14,5 +15,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: wirriamm/ats-backend:0.1
     ports:
       - "8000:8000"
