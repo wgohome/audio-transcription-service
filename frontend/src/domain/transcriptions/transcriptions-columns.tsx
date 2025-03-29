@@ -24,6 +24,18 @@ export const columns: ColumnDef<Transcription>[] = [
     accessorKey: "createdAt",
     header: "Created at",
     maxSize: 10,
-    cell: (props) => <span className="text-wrap">{JSON.stringify(props.getValue())}</span>,
+    cell: (props) => <span className="text-wrap">{formatDate(props.getValue() as string)}</span>,
   },
 ];
+
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+};
