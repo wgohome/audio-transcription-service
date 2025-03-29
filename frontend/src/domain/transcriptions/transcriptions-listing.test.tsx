@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, vi, expect } from "vitest";
+import { describe, it, vi, expect, Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: vi.fn(),
 }));
 vi.mock("@/components/data-table", () => ({
-  DataTable: ({ columns, data }: { columns: any; data: any }) => (
+  DataTable: ({ data }: { data: object }) => (
     <div data-testid="data-table">{JSON.stringify(data)}</div>
   ),
 }));
@@ -31,7 +31,7 @@ vi.mock("@uidotdev/usehooks", () => ({
 
 describe("TranscriptionListing", () => {
   it("renders the input field and data table", () => {
-    (useQuery as vi.Mock).mockReturnValue({
+    (useQuery as Mock).mockReturnValue({
       data: [],
       error: null,
       isLoading: false,
@@ -44,7 +44,7 @@ describe("TranscriptionListing", () => {
   });
 
   it("displays an error message when the query fails", () => {
-    (useQuery as vi.Mock).mockReturnValue({
+    (useQuery as Mock).mockReturnValue({
       data: null,
       error: true,
       isLoading: false,
@@ -56,7 +56,7 @@ describe("TranscriptionListing", () => {
   });
 
   it("updates the search term when typing in the input field", async () => {
-    (useQuery as vi.Mock).mockReturnValue({
+    (useQuery as Mock).mockReturnValue({
       data: [],
       error: null,
       isLoading: false,
@@ -78,7 +78,7 @@ describe("TranscriptionListing", () => {
     expect(screen.getByTestId("data-table").textContent).toBe("[]");
 
     const queryData = [{ id: 1, name: "Test Transcription" }];
-    (useQuery as vi.Mock).mockImplementation(() => ({
+    (useQuery as Mock).mockImplementation(() => ({
       data: queryData,
       error: null,
       isLoading: false,
